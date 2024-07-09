@@ -1,0 +1,9 @@
+.venv
+.vscode
+2023year
+data/anno/
+data/interim/
+DropMeFiles_KAlXK
+runs
+*.pt
+video
