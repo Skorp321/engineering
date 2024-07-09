@@ -91,7 +91,7 @@ def procesed_files(anno_path, output_path, anno_dict):
 
                     xw = (xbr - xtl) / width
                     yh = (ybr - ytl) / height
-                    xc = (xbr + xw / 2) / width
+                    xc = (xtl + xw / 2) / width
                     yc = (ytl + yh / 2) / height
 
 
@@ -163,10 +163,10 @@ def copy_fiels(item, output_path, kaind, count):
     
 if __name__ == "__main__":
     
-    anno_path = "/home/skorp321/Projects/engineering/data/anno"
-    output_path = "data/interim"
+    anno_path = "data\\anno"
+    output_path = "data\\interim"
     anno_dict = {0: "tower crane", 1 :"hook"}
     
     procesed_files(anno_path, output_path, anno_dict)
     prepare_files(output_path, anno_dict)
-    subprocess.run(['python3', '/home/skorp321/Projects/engineering/src/models/train_model.py'])
+    #subprocess.run(['python3', 'src\\models\\train_model.py'])
