@@ -86,13 +86,10 @@ def procesed_files(anno_path, output_path, anno_dict):
                     xbr = int(float(box.get("xbr")))
                     ybr = int(float(box.get("ybr")))
 
-                    x_dif = np.abs(xtl - xbr)
-                    y_dif = np.abs(ytl - ybr)
-
-                    xw = (xbr - xtl) / width
+                    xw = (xbr - xtl) / width 
                     yh = (ybr - ytl) / height
-                    xc = (xbr + xw / 2) / width
-                    yc = (ytl + yh / 2) / height
+                    xc = (xtl / width) + (xw / 2)
+                    yc = (ytl / height) + (yh / 2)
 
 
                     file_name = f"{frame:06d}.txt"

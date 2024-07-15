@@ -1,20 +1,58 @@
 import cv2
-import pandas as pd
+import time
+from ultralytics import YOLO
+import ffmpegcv
 
-img_path = 'data\\interim\\Black_river\\images\\000001.jpg'
-txt_path = 'data\\interim\\Black_river\\labels\\000001.txt'
+# Load a model
+model = YOLO("runs/detect/train2/weights/best.pt")  # pretrained YOLOv8n model
 
-txt_data = pd.read_table(txt_path, header=None, sep=" ")
-img = cv2.imread(img_path)
-height, weight, _ = img.shape
-print(weight, height)
-for _, item in txt_data.iterrows():
-    cls, x, y, w, h = item
-    x1 = int(x * weight)
-    y1 = int(y * height)
-    x2 = int(x1 + w * weight)
-    y2 = int(y1 + h * height)
-    
-    cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-cv2.imshow('img', img)
-cv2.waitKey(0)
+# Open the video file
+video_path = "video/Plechanovo/plechanovo2_0.mp4"
+#cap = cv2.VideoCapture(video_path)
+cap = ffmpegcv.VideoCapture(video_path)
+
+output_path = 'black_river_tr.mp4'  # Путь и имя для сохранения видео
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Тип кодека (например, MPEG-4)
+fps = cap.fps
+print(f"fps: {fps}")
+#fps = int(cap.get(cv2.CAP_PROP_FPS))
+frame_size = (640, 480)  # Размер кадра
+
+#out = cv2.VideoWriter('black_river.avi', cv2.VideoWriter_fourcc( * 'XVID'), fps, frame_size)
+out = ffmpegcv.VideoWriterNV(output_path, "h264", fps)
+# Loop through the video frames
+while cap.isOpened():
+    # Read a frame from the video
+    success, frame = cap.read()
+
+    if not success:
+        # Break the loop if the end of the video is reached
+        break
+
+    start = time.time()
+    # Run YOLOv8 inference on the frame
+    results = model.track(frame, persist=True, imgsz=1280, half=True, device=0, classes=0)
+    #results = model(frame, imgsz=1280, half=True, device=0, save=True)  # return a list of Results objects
+    boxes = results[0].boxes.xywh.cpu()
+    track_ids = results[0].boxes.id.int().cpu().tolist()
+    annotated_frame = results[0].plot()
+    for box, track_id in zip(boxes, track_ids):
+        x, y, w, h = box
+    # Visualize the results on the frame
+    annotated_frame = results[0].plot()
+    end = time.time() - start
+    cv2.putText(annotated_frame, f"fps: {int(1 / end)}", (20, 50), 1, 1.5, (0,0,0), 2, -1)
+    # Display the annotated frame
+
+    cv2.imshow("YOLOv10 Inference", annotated_frame)
+    out.write(annotated_frame)
+    # Break the loop if 'q' is pressed
+    if cv2.waitKey(1) & 0xFF == ord("q"):
+        break
+# Release the video capture object and close the display window
+
+cap.release()
+out.release()
+cv2.destroyAllWindows()
+
+print("Done!")

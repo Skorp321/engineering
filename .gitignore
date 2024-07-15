@@ -3,7 +3,9 @@
 2023year
 data/anno/
 data/interim/
+data/*.mp4
 DropMeFiles_KAlXK
 runs
 *.pt
-video
+video/
+models
