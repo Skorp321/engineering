@@ -35,7 +35,7 @@ while cap.isOpened():
     #results = model(frame, imgsz=1280, half=True, device=0, save=True)  # return a list of Results objects
     boxes = results[0].boxes.xywh.cpu()
     track_ids = results[0].boxes.id.int().cpu().tolist()
-    annotated_frame = results[0].plot()
+
     for box, track_id in zip(boxes, track_ids):
         x, y, w, h = box
     # Visualize the results on the frame
